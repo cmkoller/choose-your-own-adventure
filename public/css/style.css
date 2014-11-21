@@ -1,0 +1,14 @@
+@import url(http://fonts.googleapis.com/css?family=Lobster);
+
+h1.header {
+  font-family: 'Lobster';
+}
+
+.header hr {
+  margin-top: .5rem;
+}
+
+.the-end {
+  font-family: 'Lobster';
+  font-size: 4rem;
+}

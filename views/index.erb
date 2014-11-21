@@ -1,0 +1,48 @@
+<div class="large-12 columns">
+
+  <!-- Start header -->
+  <div class="row header">
+    <div class="large-12 columns clearfix">
+      <h1 class="header">Choose Your Own Adventure <small class="text-right"></small></h1>
+      <hr/>
+    </div>
+  </div>
+  <!-- End header -->
+
+
+  <div class="panel radius">
+    <h4 ><%= @title %><hr/></h4>
+    <h5 class="subheader"><%= @text %></h5>
+  </div>
+
+  <div class="row">
+    <% unless @end_point %>
+      <% option_size = 12 / @actions.length %>
+    <% end %>
+
+    <% @actions.each do |action| %>
+      <div class="<%= "large-#{option_size} small-#{option_size} columns" %>">
+        <div class="panel radius clearfix">
+          <!-- <h5>Header</h5> -->
+          <div class="row">
+            <div class="large-8 columns">
+              <h5 class="left"><%= action[0] %></h5>
+            </div>
+            <div class="small-12 large-4 columns">
+              <a href="<%= action[1] %>" class="small button radius right center">Select</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <!-- "CHOICES" row ended -->
+
+  <% if @end_point %>
+    <div class="row">
+      <h3 class="the-end text-center">The End.</h3>
+      <h6 class="text-center"><a href="/1">Click here to restart the story!</a></h6>
+    </div>
+  <% end %>
+
+</div>
