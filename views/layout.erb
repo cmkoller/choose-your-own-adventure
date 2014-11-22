@@ -9,7 +9,24 @@
   <body>
     <div class="container">
       <div class="row">
-        <%= yield %>
+        <!-- Start header -->
+          <div class="large-12 columns">
+            <div class="nav-bar right">
+              <ul class="button-group">
+                <li><a href="/create" class="button">Make your Own</a></li>
+                <li><a href="" class="button">View More Adventures</a></li>
+              </ul>
+            </div>
+            <h1 class="header">Choose Your Own Adventure <small class="text-right"></small></h1>
+            <hr/>
+          </div>
+        <!-- End header -->
+      </div>
+
+      <div class="row">
+        <div class="large-12 columns">
+          <%= yield %>
+        </div>
       </div>
     </div>
   </body>

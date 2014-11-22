@@ -32,10 +32,10 @@ end
 
 
 get '/' do
-  redirect '/1'
+  redirect 'story/1'
 end
 
-get '/:index' do
+get '/story/:index' do
   @index = params[:index]
 
   @title = adventure[@index][:title]
@@ -44,4 +44,40 @@ get '/:index' do
   @actions = adventure[@index][:actions]
 
   erb :index
+end
+
+post '/create' do
+  @new_submission = true
+  if params[:title]
+    @new_submission = false
+
+    if @new_submission
+      # file = CREATE NEW FILE
+      header_info = []
+      header_info << params[:title]
+      header_info << params[:author]
+      # Put HEADER into file
+    else
+      # file = READ FILE HERE
+    end
+
+    page = []
+    page << 1
+    page << params[:page_header]
+    page << params[:page_text]
+    4.times do |n|
+      if params["opt_#{n + 1}"]
+        page << params["opt_#{n + 1}"]
+        page << params["id_#{n + 1}"]
+      end
+    end
+  # Put PAGE into file
+  end
+
+  # Set
+  redirect '/create'
+end
+
+get '/create' do
+  erb :new_adventure
 end
