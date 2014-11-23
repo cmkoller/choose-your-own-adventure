@@ -1,81 +1,96 @@
 <h1>Make Your Own Adventure</h1>
 
 <form action="/create" method="get">
-    <label>
+
+  <div class="row">
+    <% if @new_submission %>
       <!-- ONLY DISPLAY THIS if it's the first post -->
-      <div class="row">
-        <div class="large-6 columns">
-          <label for="title">Title:</label>
-          <input type="text" id="title" name="title" required/>
-        </div>
-        <div class="large-6 columns">
-          <label for="author">Written by:</label>
-          <input type="text" id="author" name="author" required/>
-        </div>
+      <div class="large-6 columns">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required/>
       </div>
-      <hr />
+      <div class="large-6 columns">
+        <label for="author">Written by:</label>
+        <input type="text" id="author" name="author" required/>
+      </div>
       <!-- end ONLY DISPLAY THIS -->
-
-      <div class="row">
-        <div class="large-6 columns">
-          <label for="page_header">Page header:</label>
-          <input type="text" id="page_header" name="page_header" required/>
-        </div>
-        <div class="large-6 columns">
-          <label for="page_text">Page text:</label>
-          <input type="text" id="page_text" name="page_text" required/>
-        </div>
+    <% else %>
+      <!-- Display this once title has been assigned -->
+      <div class="large-6 columns">
+        <label for="title">Title:</label>
+        <h6><%= @title %></h6>
+        <input type="hidden" id="title" name="title" value="<%= @title %>"/>
       </div>
-
-      <div class="row">
-        <div class="large-3 columns">
-          <label for="opt_1">Option 1:</label>
-          <input type="text" id="opt_1" name="opt_1" />
-
-          <label for="id_1">Destination of Option 1:</label>
-          <input type="text" id="id_1" name="id_1" />
-        </div>
-        <div class="large-3 columns">
-          <label for="opt_2">Option 2:</label>
-          <input type="text" id="opt_2" name="opt_2" />
-
-          <label for="id_2">Destination of Option 2:</label>
-          <input type="text" id="id_2" name="id_2" />
-        </div>
-        <div class="large-3 columns">
-          <label for="opt_3">Option 3:</label>
-          <input type="text" id="opt_3" name="opt_3" />
-
-          <label for="id_3">Destination of Option 3:</label>
-          <input type="text" id="id_3" name="id_3" />
-        </div>
-        <div class="large-3 columns">
-          <label for="opt_4">Option 4:</label>
-          <input type="text" id="opt_4" name="opt_4" />
-
-          <label for="id_4">Destination of Option 4:</label>
-          <input type="text" id="id_4" name="id_4" />
-        </div>
+      <div class="large-6 columns">
+        <label for="author">Author:</label>
+        <h6><%= @author %></h6>
+        <input type="hidden" id="author" name="author" value="<%= @author %>"/>
       </div>
-    </label>
+      <!-- End display this once title has been assigned -->
+    <% end %>
+  </div>
+  <hr />
+
+  <div class="row">
+    <div class="large-6 columns">
+      <label for="page_header">Page header:</label>
+      <input type="text" id="page_header" name="page_header" required/>
+    </div>
+    <div class="large-6 columns">
+      <label for="page_text">Page text:</label>
+      <input type="text" id="page_text" name="page_text" required/>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="large-3 columns">
+      <label for="opt_1">Option 1:</label>
+      <input type="text" id="opt_1" name="opt_1" />
+
+      <label for="id_1">Destination of Option 1:</label>
+      <input type="text" id="id_1" name="id_1" />
+    </div>
+    <div class="large-3 columns">
+      <label for="opt_2">Option 2:</label>
+      <input type="text" id="opt_2" name="opt_2" />
+
+      <label for="id_2">Destination of Option 2:</label>
+      <input type="text" id="id_2" name="id_2" />
+    </div>
+    <div class="large-3 columns">
+      <label for="opt_3">Option 3:</label>
+      <input type="text" id="opt_3" name="opt_3" />
+
+      <label for="id_3">Destination of Option 3:</label>
+      <input type="text" id="id_3" name="id_3" />
+    </div>
+    <div class="large-3 columns">
+      <label for="opt_4">Option 4:</label>
+      <input type="text" id="opt_4" name="opt_4" />
+
+      <label for="id_4">Destination of Option 4:</label>
+      <input type="text" id="id_4" name="id_4" />
+    </div>
+  </div>
+
+  <!-- START TABLE -->
+  <table>
+    <tr>
+      <th>Index</th>
+      <th>Title</th>
+      <th>Text</th>
+      <th>Option 1</th>
+      <th>Destination 1</th>
+      <th>Option 2</th>
+      <th>Destination 2</th>
+      <th>Option 3</th>
+      <th>Destination 3</th>
+      <th>Option 4</th>
+      <th>Destination 4</th>
+    </tr>
+
+  </table>
+  <!-- END TABLE -->
+
+  <input type="submit" value="Submit">
 </form>
-
-<table>
-  <tr>
-    <th>Index</th>
-    <th>Title</th>
-    <th>Text</th>
-    <th>Option 1</th>
-    <th>Destination 1</th>
-    <th>Option 2</th>
-    <th>Destination 2</th>
-    <th>Option 3</th>
-    <th>Destination 3</th>
-    <th>Option 4</th>
-    <th>Destination 4</th>
-  </tr>
-
-</table>
-
-<!-- CENTER THIS -->
-<a href="#" class="button right text-center">I'm done!</a>

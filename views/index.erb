@@ -4,6 +4,7 @@
   <h5 class="subheader"><%= @text %></h5>
 </div>
 
+<!-- "CHOICES" row begin -->
 <div class="row">
   <% unless @end_point %>
     <% option_size = 12 / @actions.length %>
@@ -27,9 +28,11 @@
 </div>
 <!-- "CHOICES" row ended -->
 
+<!-- "THE END" row begin -->
 <% if @end_point %>
   <div class="row">
     <h3 class="the-end text-center">The End.</h3>
-    <h6 class="text-center"><a href="/1">Click here to restart the story!</a></h6>
+    <h6 class="text-center"><a href="/story/1">Click here to restart the story!</a></h6>
   </div>
 <% end %>
+<!-- "THE END" row begin -->
