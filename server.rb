@@ -82,46 +82,58 @@ get '/create' do
     @title = params[:title]
     @author = params[:author]
     filename = "#{@title.gsub(" ", "_")}.csv"
-    @new_page_id = params[:page_id].to_i + 1
-    #@page_id = @page_id_start.to_i + 1
 
-    if File.exist?(filename)
+    # Begin IF loop for deleting vs. writing page
+    if params[:delete_this_row]
       @new_submission = false
-    end
+      lines = CSV.read(filename)
+      CSV.open(filename, 'w') do |csv|
+        (0..lines.length - 1).each do |i|
+          unless i == params[:delete_this_row].to_i
+            csv << lines[i]
+          end
+        end
+      end
+    else
+      if File.exist?(filename)
+        @new_submission = false
+      end
+
+      if @new_submission
+        header_info = []
+        header_info << @title
+        header_info << @author
+        # Put HEADER into file
+        CSV.open(filename, "a+") do |csv|
+          csv << header_info
+        end
+        File.open(LIST_OF_STORIES, "a") do |file|
+          file << "#{filename}\n"
+        end
+        @new_submission = false
+      end
+
+      @new_page_id = CSV.read(filename).length + 1
+
+      page = []
+      page << @new_page_id - 1
+      page << params[:page_header]
+      page << params[:page_text]
+      @options = [false, false, false, false]
+      4.times do |n|
+        unless params["opt_#{n + 1}"] == ""
+          @options[n] = true
+          page << params["opt_#{n + 1}"]
+          page << params["id_#{n + 1}"]
+        end
+      end
 
 
-    if @new_submission
-      header_info = []
-      header_info << @title
-      header_info << @author
-      # Put HEADER into file
       CSV.open(filename, "a+") do |csv|
-        csv << header_info
-      end
-      File.open(LIST_OF_STORIES, "a") do |file|
-        file << "filename\n"
-      end
-      @new_submission = false
-    end
-
-
-    page = []
-    page << @new_page_id - 1
-    page << params[:page_header]
-    page << params[:page_text]
-    @options = [false, false, false, false]
-    4.times do |n|
-      unless params["opt_#{n + 1}"] == ""
-        @options[n] = true
-        page << params["opt_#{n + 1}"]
-        page << params["id_#{n + 1}"]
+        csv << page
       end
     end
-
-
-    CSV.open(filename, "a+") do |csv|
-      csv << page
-    end
+    # End IF loop for deleting vs. writing page
 
     # Begin IF loop for printing existing pages
     if File.exist?(filename)

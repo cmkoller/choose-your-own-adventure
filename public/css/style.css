@@ -16,3 +16,7 @@ h1.header {
 .story-title {
   font-style: italic;
 }
+
+table {
+  width: 100%;
+}
