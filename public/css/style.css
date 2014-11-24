@@ -12,3 +12,7 @@ h1.header {
   font-family: 'Lobster';
   font-size: 4rem;
 }
+
+.story-title {
+  font-style: italic;
+}

@@ -1,7 +1,13 @@
 require 'sinatra'
 require 'csv'
 
-# Creates a hash of adventures, with PAGE_ID --> PAGE_INFO_HASH pairings.
+LIST_OF_STORIES = 'list_of_stories.txt'
+
+# Creates a hash of adventures with:
+# => :STORY_TITLE
+# => :AUTHOR
+# => :PAGES, a hash of PAGE_ID (integer) --> PAGE_INFO_HASH pairings;
+# =>  one for each page in the story.
 # Within each page's hash, values are:
 # => :TITLE, title of page
 # => :TEXT, the main story text to be displayed on each page
@@ -12,14 +18,18 @@ def process_adventure(filename)
   unprocessed_adventure = CSV.read(filename)
   adventure = {}
 
+  meta_info = unprocessed_adventure.shift
+  adventure[:story_title] = meta_info[0]
+  adventure[:author] = meta_info[1]
+  adventure[:pages] = {}
   unprocessed_adventure.each do |page|
     index = page[0]
     title = page[1]
     text = page[2]
     actions = page[3..-1]
 
-    adventure[index] = {}
-    current = adventure[index]
+    adventure[:pages][index] = {}
+    current = adventure[:pages][index]
 
     current[:title] = title
     current[:text] = text
@@ -40,31 +50,40 @@ end
 
 
 get '/' do
-  redirect 'story/1'
+  redirect '/stories'
 end
 
-get '/story/:index' do
-  adventure = process_adventure('adventure.csv')
+get '/story/:name' do
+  redirect "/story/#{params[:name]}/1"
+end
+
+get '/story/:name/:index' do
+  story_name = params[:name]
+  adventure = process_adventure("#{story_name}.csv")
 
   @index = params[:index]
 
-  @title = adventure[@index][:title]
-  @text = adventure[@index][:text]
-  @end_point = adventure[@index][:end_point]
-  @actions = adventure[@index][:actions]
+  @story_title = adventure[:story_title]
+  @author = adventure[:author]
+  page_info = adventure[:pages][@index]
+  @title = page_info[:title]
+  @text = page_info[:text]
+  @end_point = page_info[:end_point]
+  @actions = page_info[:actions]
 
-  erb :index
+  erb :story_view
 end
 
 get '/create' do
   @new_submission = true
-
+  @new_page_id = 1
   # Begin IF loop for retrieving form input
   if params[:title]
     @title = params[:title]
     @author = params[:author]
     filename = "#{@title.gsub(" ", "_")}.csv"
-
+    @new_page_id = params[:page_id].to_i + 1
+    #@page_id = @page_id_start.to_i + 1
 
     if File.exist?(filename)
       @new_submission = false
@@ -79,12 +98,15 @@ get '/create' do
       CSV.open(filename, "a+") do |csv|
         csv << header_info
       end
+      File.open(LIST_OF_STORIES, "a") do |file|
+        file << "filename\n"
+      end
       @new_submission = false
     end
 
 
     page = []
-    page << 1
+    page << @new_page_id - 1
     page << params[:page_header]
     page << params[:page_text]
     @options = [false, false, false, false]
@@ -100,15 +122,19 @@ get '/create' do
     CSV.open(filename, "a+") do |csv|
       csv << page
     end
+
+    # Begin IF loop for printing existing pages
+    if File.exist?(filename)
+      @adventure = process_adventure(filename)[:pages].sort_by { |k, v| k }
+    end
+    # End IF loop for printing existing pages
   end
   # End IF loop for retrieving form input
 
-  # Begin IF loop for printing existing pages
-  if File.exist?(filename)
-    @adventure = process_adventure(filename)
-
-  end
-  # End IF loop for printing existing pages
-
   erb :new_adventure
+end
+
+get '/stories' do
+  @stories = File.read(LIST_OF_STORIES).split("\n")
+  erb :stories
 end

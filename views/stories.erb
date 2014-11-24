@@ -1,0 +1,10 @@
+<h3>Browse Adventures</h3>
+<ul>
+  <% @stories.each do |file| %>
+    <li>
+      <a href="/story/<%= file[0..-5]%>">
+        <%= file.gsub("_", " ")[0..-5] %>
+      </a> - by <%= CSV.read(file)[0][1]%>
+    </li>
+  <% end %>
+</ul>
