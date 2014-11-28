@@ -1,10 +1,16 @@
-<h3>Browse Adventures</h3>
+<h3>Browse Adventures:</h3>
 <ul>
   <% @stories.each do |file| %>
     <li>
       <a href="/story/<%= file[0..-5]%>">
         <%= file.gsub("_", " ")[0..-5] %>
       </a> - by <%= CSV.read(file)[0][1]%>
+      <form action="/stories" method="post">
+        <td>
+          <input type="hidden" name="delete" value="<%= page["id"] %>">
+          <input type="submit" value="X" class="button small">
+        </td>
+      </form>
     </li>
   <% end %>
 </ul>

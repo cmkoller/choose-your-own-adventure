@@ -1,5 +1,18 @@
 require 'sinatra'
 require 'csv'
+require 'pg'
+require 'pry'
+
+def db_connection
+  begin
+    connection = PG.connect(dbname: 'adventures')
+
+    yield(connection)
+
+  ensure
+    connection.close
+  end
+end
 
 LIST_OF_STORIES = 'list_of_stories.txt'
 
@@ -75,76 +88,94 @@ get '/story/:name/:index' do
 end
 
 get '/create' do
-  @new_submission = true
-  @new_page_id = 1
-  # Begin IF loop for retrieving form input
-  if params[:title]
-    @title = params[:title]
-    @author = params[:author]
-    filename = "#{@title.gsub(" ", "_")}.csv"
-
-    # Begin IF loop for deleting vs. writing page
-    if params[:delete_this_row]
-      @new_submission = false
-      lines = CSV.read(filename)
-      CSV.open(filename, 'w') do |csv|
-        (0..lines.length - 1).each do |i|
-          unless i == params[:delete_this_row].to_i
-            csv << lines[i]
-          end
-        end
-      end
-    else
-      if File.exist?(filename)
-        @new_submission = false
-      end
-
-      if @new_submission
-        header_info = []
-        header_info << @title
-        header_info << @author
-        # Put HEADER into file
-        CSV.open(filename, "a+") do |csv|
-          csv << header_info
-        end
-        File.open(LIST_OF_STORIES, "a") do |file|
-          file << "#{filename}\n"
-        end
-        @new_submission = false
-      end
-
-      @new_page_id = CSV.read(filename).length + 1
-
-      page = []
-      page << @new_page_id - 1
-      page << params[:page_header]
-      page << params[:page_text]
-      @options = [false, false, false, false]
-      4.times do |n|
-        unless params["opt_#{n + 1}"] == ""
-          @options[n] = true
-          page << params["opt_#{n + 1}"]
-          page << params["id_#{n + 1}"]
-        end
-      end
-
-
-      CSV.open(filename, "a+") do |csv|
-        csv << page
-      end
-    end
-    # End IF loop for deleting vs. writing page
-
-    # Begin IF loop for printing existing pages
-    if File.exist?(filename)
-      @adventure = process_adventure(filename)[:pages].sort_by { |k, v| k }
-    end
-    # End IF loop for printing existing pages
-  end
-  # End IF loop for retrieving form input
-
-  erb :new_adventure
+  erb :new_story
 end
+
+post '/create' do
+  @title = params[:title]
+  @author = params[:author]
+  db_connection do |connection|
+    connection.exec_params("INSERT INTO stories (title, author) VALUES ($1, $2);",
+    [@title, @author])
+    @id = connection.exec("SELECT currval('stories_id_seq');")
+  end
+
+  redirect "/create/#{@id}"
+end
+
+get '/create/:story_id' do
+  @id = params[:story_id]
+  db_connection do |connection|
+    story_info = connection.exec_params("SELECT title, author
+    FROM stories WHERE id = $1", [@id])
+    @title = story_info[0]["title"]
+    @author = story_info[0]["author"]
+    @info = connection.exec_params("SELECT * FROM pages WHERE story_id = $1",
+    [@id])
+  end
+    # Display info read from PAGES folder if it exists
+
+  erb :new_page
+end
+
+post '/create/:story_id' do
+  @id = params[:story_id]
+  if params[:delete]
+    db_connection do |connection|
+      connection.exec("DELETE FROM pages WHERE id = #{params[:delete]}")
+    end
+  else
+    # Write the new page to the PAGES database
+    page_num = params[:page_id]
+    page_header = params[:page_header]
+    page_body = params[:page_text]
+    story_id = params[:story_id]
+    # Option 1
+    if params[:opt_1] != ""
+      action1 = params[:opt_1]
+      dest1 = params[:id_1]
+    else
+      action1 = NIL
+      dest1 = NIL
+    end
+    # Option 2
+    if params[:opt_2] != ""
+      action2 = params[:opt_2]
+      dest2 = params[:id_2]
+    else
+      action2 = NIL
+      dest2 = NIL
+    end
+    # Option 3
+    if params[:opt_3] != ""
+      action3 = params[:opt_3]
+      dest3 = params[:id_3]
+    else
+      action3 = NIL
+      dest3 = NIL
+    end
+    # Option 4
+    if params[:opt_4] != ""
+      action4 = params[:opt_4]
+      dest4 = params[:id_4]
+    else
+      action4 = NIL
+      dest4 = NIL
+    end
+    db_connection do |connection|
+      connection.exec_params("INSERT INTO pages (page_header, page_body, action1,
+      dest1, action2, dest2, action3, dest3, action4, dest4, story_id, page_num)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);",
+      [page_header, page_body, action1, dest1, action2, dest2, action3, dest3,
+        action4, dest4, story_id, page_num])
+    end
+  end
+
+  # Redirect to display the page
+  redirect "/create/#{params[:story_id]}"
+end
+
+
 
 get '/stories' do
   @stories = File.read(LIST_OF_STORIES).split("\n")
