@@ -18,16 +18,16 @@
     <% option_size = 12 / @actions.length %>
   <% end %>
 
-  <% @actions.each do |action| %>
+  <% @actions.each do |action, dest| %>
     <div class="<%= "large-#{option_size} small-#{option_size} columns" %>">
       <div class="panel radius clearfix">
         <!-- <h5>Header</h5> -->
         <div class="row">
           <div class="large-8 columns">
-            <h5 class="left"><%= action[0] %></h5>
+            <h5 class="left"><%= action %></h5>
           </div>
           <div class="small-12 large-4 columns">
-            <a href="<%= action[1] %>" class="small button radius right center">Select</a>
+            <a href="<%= dest %>" class="small button radius right center">Select</a>
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
 <% if @end_point %>
   <div class="row">
     <h3 class="the-end text-center">The End.</h3>
-    <h6 class="text-center"><a href="/story/1">Click here to restart the story!</a></h6>
+    <h6 class="text-center"><a href="/story/<%= @story_index %>/1">Click here to restart the story!</a></h6>
   </div>
 <% end %>
 <!-- "THE END" row begin -->

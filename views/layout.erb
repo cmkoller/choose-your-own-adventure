@@ -17,7 +17,7 @@
                 <li><a href="/stories" class="button">View More Adventures</a></li>
               </ul>
             </div>
-            <h1 class="header">Choose Your Own Adventure <small class="text-right"></small></h1>
+            <a href="/"><h1 class="header">Choose Your Own Adventure</h1></a>
             <hr/>
         <!-- End header -->
       </div>
@@ -32,36 +32,8 @@
     <script src="/js/vendor/jquery.js"></script>
     <script src="/js/vendor/fastclick.js"></script>
     <script src="/js/foundation.min.js"></script>
-
-    <script>
-    $(document).foundation({
-      reveal: {
-        animation: 'fadeAndPop',
-        animation_speed: 200,
-        close_on_background_click: true,
-        close_on_esc: true,
-        dismiss_modal_class: 'close-reveal-modal',
-        bg_class: 'reveal-modal-bg',
-        open: function () { console.log('fired from settings'); },
-        opened: function () { },
-        close: function () { },
-        closed: function () { },
-        bg: $('.reveal-modal-bg'),
-        css: {
-          open: {
-            'opacity': 0,
-            'visibility': 'visible',
-            'display': 'block'
-          },
-          close: {
-            'opacity': 1,
-            'visibility': 'hidden',
-            'display': 'none'
-          }
-        }
-      }
-    });
-    </script>
+    <script src="/js/delete_alert.js"></script>
+    <script src="/js/reveal_modal.js"></script>
 
   </body>
 </html>

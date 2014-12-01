@@ -25,11 +25,15 @@ get '/stories' do
 end
 
 post '/stories' do
-  db_connection do |connection|
-    connection.exec_params("DELETE FROM stories WHERE id = $1",
-    [params[:delete]])
+  if params[:delete]
+    db_connection do |connection|
+      connection.exec_params("DELETE FROM stories WHERE id = $1",
+      [params[:delete]])
+    end
+    redirect '/stories'
+  elsif params[:edit]
+    redirect "/create/#{params[:edit]}"
   end
-  redirect '/stories'
 end
 
 get '/story/:index' do
@@ -37,26 +41,28 @@ get '/story/:index' do
 end
 
 get '/story/:index/:page' do
-  story_index = params[:index]
+  @story_index = params[:index]
   page = params[:page]
 
   db_connection do |connection|
-    info = connection.exec_params("SELECT
-      FROM pages.page_header, pages.page_body, pages.action1, pages.dest1,
-      pages.action2, pages.dest2, pages.action3, pages.dest3, pages.action4,
-      pages.dest5, stories.title AS story_title, stories.author
+    info = connection.exec_params("SELECT pages.page_header, pages.page_body,
+      pages.action1, pages.dest1, pages.action2, pages.dest2, pages.action3,
+      pages.dest3, pages.action4, pages.dest4, stories.title AS story_title,
+      stories.author
+      FROM stories
       JOIN pages ON stories.id = pages.story_id
       WHERE stories.id = $1 AND pages.page_num = $2",
-    [story_index, page])
+    [@story_index, page])
 
     @story_title = info[0]["story_title"]
     @author = info[0]["author"]
     @page_header = info[0]["page_header"]
     @text = info[0]["page_body"]
-    @actions = [info[0]["action1"], info[0]["dest1"], info[0]["action2"],
-    info[0]["dest2"], info[0]["action3"], info[0]["dest3"], info[0]["action4"],
-    info[0]["dest4"]]
-    @actions.delete(NIL)
+    @actions = {info[0]["action1"] => info[0]["dest1"],
+      info[0]["action2"] => info[0]["dest2"],
+      info[0]["action3"] => info[0]["dest3"],
+      info[0]["action4"] => info[0]["dest4"]}
+    @actions.delete_if { |k, v| k.nil? || v.nil? }
     if @actions.empty?
       @end_point = true
     else

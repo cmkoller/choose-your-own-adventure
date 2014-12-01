@@ -1,15 +1,17 @@
 <h3>Browse Adventures:</h3>
 <ul>
   <% @stories.each do |story| %>
-    <li>
+    <li class="story-listing">
       <a href="/story/<%= story["id"] %>">
         <%= story["title"] %>
       </a> - by <%= story["author"] %>
-      <form action="/stories" method="post">
-        <td>
-          <input type="hidden" name="delete" value="<%= story["id"] %>">
-          <input type="submit" value="X" class="button small">
-        </td>
+      <form action="/stories" method="post" class="edit-story edit">
+        <input type="hidden" name="edit" value="<%= story["id"] %>">
+        <input type="submit" value="Edit" class="small edit-button">
+      </form>
+      <form action="/stories" method="post" class="edit-story delete">
+        <input type="hidden" name="delete" value="<%= story["id"] %>">
+        <input type="submit" value="Delete" class="small edit-button">
       </form>
     </li>
   <% end %>
