@@ -1,7 +1,6 @@
 require 'sinatra'
 require 'csv'
 require 'pg'
-require 'pry'
 
 def db_connection
   begin
@@ -30,7 +29,7 @@ post '/stories' do
     connection.exec_params("DELETE FROM stories WHERE id = $1",
     [params[:delete]])
   end
-  redirect '/storiesø'
+  redirect '/stories'
 end
 
 get '/story/:index' do
@@ -78,9 +77,8 @@ post '/create' do
   db_connection do |connection|
     connection.exec_params("INSERT INTO stories (title, author) VALUES ($1, $2);",
     [@title, @author])
-    @id = connection.exec("SELECT currval('stories_id_seq');")
+    @id = connection.exec("SELECT currval('stories_id_seq') AS id;").first["id"]
   end
-
   redirect "/create/#{@id}"
 end
 
@@ -94,7 +92,6 @@ get '/create/:story_id' do
     @info = connection.exec_params("SELECT * FROM pages WHERE story_id = $1",
     [@id])
   end
-    # Display info read from PAGES folder if it exists
 
   erb :new_page
 end
