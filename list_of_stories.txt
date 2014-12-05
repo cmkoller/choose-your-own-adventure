@@ -1,3 +1,0 @@
-A_Launch_Academy_Adventure.csv
-Simple.csv
-hello.csv

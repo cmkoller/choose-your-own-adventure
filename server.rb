@@ -1,6 +1,11 @@
-require 'sinatra'
 require 'csv'
 require 'pg'
+require 'sinatra'
+require 'sinatra/activerecord'
+require 'pry'
+
+require_relative 'models/story'
+require_relative 'models/page'
 
 def db_connection
   begin
@@ -18,18 +23,14 @@ get '/' do
 end
 
 get '/stories' do
-  db_connection do |connection|
-    @stories = connection.exec("SELECT * FROM stories")
-  end
+  @stories = Story.all
   erb :stories
 end
 
 post '/stories' do
   if params[:delete]
-    db_connection do |connection|
-      connection.exec_params("DELETE FROM stories WHERE id = $1",
-      [params[:delete]])
-    end
+    # FIGURE OUT HOW TO SANATIZE THIS
+    Story.delete([params[:delete]])
     redirect '/stories'
   elsif params[:edit]
     redirect "/create/#{params[:edit]}"
@@ -41,33 +42,22 @@ get '/story/:index' do
 end
 
 get '/story/:index/:page' do
-  @story_index = params[:index]
-  page = params[:page]
+  story_id = params[:index]
+  page_id = params[:page]
 
-  db_connection do |connection|
-    info = connection.exec_params("SELECT pages.page_header, pages.page_body,
-      pages.action1, pages.dest1, pages.action2, pages.dest2, pages.action3,
-      pages.dest3, pages.action4, pages.dest4, stories.title AS story_title,
-      stories.author
-      FROM stories
-      JOIN pages ON stories.id = pages.story_id
-      WHERE stories.id = $1 AND pages.page_num = $2",
-    [@story_index, page])
+  # SANATIZE THIS
+  @story = Story.find(story_id)
+  @page = Page.where("story_id = ?", story_id).find(page_id)
 
-    @story_title = info[0]["story_title"]
-    @author = info[0]["author"]
-    @page_header = info[0]["page_header"]
-    @text = info[0]["page_body"]
-    @actions = {info[0]["action1"] => info[0]["dest1"],
-      info[0]["action2"] => info[0]["dest2"],
-      info[0]["action3"] => info[0]["dest3"],
-      info[0]["action4"] => info[0]["dest4"]}
-    @actions.delete_if { |k, v| k.nil? || v.nil? }
-    if @actions.empty?
-      @end_point = true
-    else
-      @end_point = false
-    end
+  @actions = {@page.action1 => @page.dest1,
+    @page.action2 => @page.dest2,
+    @page.action3 => @page.dest3,
+    @page.action4 => @page.dest4}
+  @actions.delete_if { |k, v| k.nil? || v.nil? }
+  if @actions.empty?
+    @end_point = true
+  else
+    @end_point = false
   end
 
   erb :story_view
@@ -78,26 +68,17 @@ get '/create' do
 end
 
 post '/create' do
-  @title = params[:title]
-  @author = params[:author]
-  db_connection do |connection|
-    connection.exec_params("INSERT INTO stories (title, author) VALUES ($1, $2);",
-    [@title, @author])
-    @id = connection.exec("SELECT currval('stories_id_seq') AS id;").first["id"]
-  end
-  redirect "/create/#{@id}"
+  title = params[:title]
+  author = params[:author]
+  story = Story.create(title: title, author: author)
+  id = story.id
+  redirect "/create/#{id}"
 end
 
 get '/create/:story_id' do
   @id = params[:story_id]
-  db_connection do |connection|
-    story_info = connection.exec_params("SELECT title, author
-    FROM stories WHERE id = $1", [@id])
-    @title = story_info[0]["title"]
-    @author = story_info[0]["author"]
-    @info = connection.exec_params("SELECT * FROM pages WHERE story_id = $1",
-    [@id])
-  end
+  @story = Story.find(@id)
+  @pages = Page.where(story_id: @id)
 
   erb :new_page
 end
@@ -105,10 +86,8 @@ end
 post '/create/:story_id' do
   @id = params[:story_id]
   if params[:delete]
-    db_connection do |connection|
-      connection.exec_params("DELETE FROM pages WHERE id = $1",
-      [params[:delete]])
-    end
+    # SANATIZE THIS
+    Page.delete(params[:delete])
   else
     # Write the new page to the PAGES database
     page_num = params[:page_id]
@@ -147,13 +126,10 @@ post '/create/:story_id' do
       action4 = NIL
       dest4 = NIL
     end
-    db_connection do |connection|
-      connection.exec_params("INSERT INTO pages (page_header, page_body, action1,
-      dest1, action2, dest2, action3, dest3, action4, dest4, story_id, page_num)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);",
-      [page_header, page_body, action1, dest1, action2, dest2, action3, dest3,
-        action4, dest4, story_id, page_num])
-    end
+    Page.create({page_header: page_header, page_body: page_body,
+      action1: action1, dest1: dest1, action2: action2, dest2: dest2,
+      action3: action3, dest3: dest3, action4: action4, dest4: dest4,
+      story_id: story_id, page_num: page_num})
   end
 
   # Redirect to display the page

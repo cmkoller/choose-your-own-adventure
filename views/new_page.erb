@@ -29,11 +29,11 @@
     <div class="row">
       <div class="large-6 columns">
         <label for="title">Title:</label>
-        <h6><%= @title %></h6>
+        <h6><%= @story.title %></h6>
       </div>
       <div class="large-6 columns">
         <label for="author">Author:</label>
-        <h6><%= @author %></h6>
+        <h6><%= @story.author %></h6>
       </div>
     </div>
     <hr />
@@ -112,22 +112,22 @@
       </tr>
     </thead>
     <tbody>
-      <% @info.each do |page| %>
+      <% @pages.each do |page| %>
         <tr>
-          <td><%= page["page_num"] %></td>
-          <td><%= page["page_header"] %></td>
-          <td><%= page["page_body"] %></td>
-          <td><%= page["action1"] %></td>
-          <td><%= page["dest1"] %></td>
-          <td><%= page["action2"] %></td>
-          <td><%= page["dest2"] %></td>
-          <td><%= page["action3"] %></td>
-          <td><%= page["dest3"] %></td>
-          <td><%= page["action4"] %></td>
-          <td><%= page["dest4"] %></td>
+          <td><%= page.page_num %></td>
+          <td><%= page.page_header %></td>
+          <td><%= page.page_body %></td>
+          <td><%= page.action1 %></td>
+          <td><%= page.dest1 %></td>
+          <td><%= page.action2 %></td>
+          <td><%= page.dest2 %></td>
+          <td><%= page.action3 %></td>
+          <td><%= page.dest3 %></td>
+          <td><%= page.action4 %></td>
+          <td><%= page.dest4 %></td>
           <form action="<%="/create/#{@id}"%>" method="post">
             <td>
-              <input type="hidden" name="delete" value="<%= page["id"] %>">
+              <input type="hidden" name="delete" value="<%= page.id %>">
               <input type="submit" value="X" class="button small">
             </td>
           </form>
