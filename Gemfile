@@ -6,9 +6,9 @@ gem 'rake'
 gem 'sinatra'
 gem 'sinatra-activerecord'
 gem 'sinatra-flash'
+gem 'dotenv'
 
 
 group :development, :test do
   gem 'pry'
-  gem 'dotenv'
 end
