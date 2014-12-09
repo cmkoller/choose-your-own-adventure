@@ -32,15 +32,15 @@ ActiveRecord::Schema.define(version: 20141209155752) do
   end
 
   create_table "stories", force: true do |t|
-    t.string  "title"
-    t.string  "author"
-    t.integer "user_id"
+    t.string "title"
+    t.string "user_id"
   end
 
   create_table "users", force: true do |t|
     t.string   "provider",   null: false
     t.string   "uid",        null: false
     t.string   "username",   null: false
+    t.string   "name",       null: false
     t.string   "email",      null: false
     t.string   "avatar_url", null: false
     t.datetime "created_at"

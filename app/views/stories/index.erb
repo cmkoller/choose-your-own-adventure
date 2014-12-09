@@ -1,0 +1,20 @@
+<h3>Browse Adventures:</h3>
+<ul>
+  <% @stories.each do |story| %>
+    <li class="story-listing">
+      <a href="/story/<%= story.id %>">
+        <%= story.title %>
+      </a> - by <%= User.find(story.user_id).first_name %>
+      <% if signed_in? && story.user_id == session[:user_id].to_s %>
+        <form action="/stories" method="post" class="edit-story edit">
+          <input type="hidden" name="edit" value="<%= story.id %>">
+          <input type="submit" value="Edit" class="small edit-button">
+        </form>
+        <form action="/stories" method="post" class="edit-story delete">
+          <input type="hidden" name="delete" value="<%= story.id %>">
+          <input type="submit" value="Delete" class="small edit-button">
+        </form>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

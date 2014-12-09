@@ -1,20 +1,41 @@
+require 'Dotenv'
 require 'csv'
 require 'pg'
 require 'sinatra'
 require 'sinatra/activerecord'
 require 'pry'
+require 'sinatra/flash'
 
-require_relative 'models/story'
-require_relative 'models/page'
+require 'omniauth-github'
 
-def db_connection
-  begin
-    connection = PG.connect(dbname: 'adventures')
 
-    yield(connection)
+require_relative 'config/application'
 
-  ensure
-    connection.close
+
+Dotenv.load
+
+Dir['app/**/*.rb'].each { |file| require_relative file }
+
+helpers do
+  def current_user
+    user_id = session[:user_id]
+    @current_user ||= User.find(user_id) if user_id.present?
+  end
+
+  def signed_in?
+    current_user.present?
+  end
+
+end
+
+def set_current_user(user)
+  session[:user_id] = user.id
+end
+
+def authenticate!
+  unless signed_in?
+    flash[:notice] = 'You need to sign in if you want to do that!'
+    redirect '/'
   end
 end
 
@@ -22,9 +43,26 @@ get '/' do
   redirect '/stories'
 end
 
+get '/auth/github/callback' do
+  auth = env['omniauth.auth']
+
+  user = User.find_or_create_from_omniauth(auth)
+  set_current_user(user)
+  flash[:notice] = "You're now signed in as #{user.username}!"
+  redirect '/'
+end
+
+get '/sign_out' do
+  session[:user_id] = nil
+  flash[:notice] = "You have been signed out."
+
+  redirect '/'
+end
+
 get '/stories' do
+
   @stories = Story.all
-  erb :stories
+  erb :'/stories/index'
 end
 
 post '/stories' do
@@ -47,7 +85,7 @@ get '/story/:index/:page' do
 
   # SANATIZE THIS
   @story = Story.find(story_id)
-  @page = Page.where("story_id = ?", story_id).find(page_id)
+  @page = Page.where("story_id = ?", story_id).find_by  page_num: page_id
 
   @actions = {@page.action1 => @page.dest1,
     @page.action2 => @page.dest2,
@@ -60,17 +98,17 @@ get '/story/:index/:page' do
     @end_point = false
   end
 
-  erb :story_view
+  erb :'/stories/show'
 end
 
 get '/create' do
-  erb :new_story
+  erb :'/create/new_story'
 end
 
 post '/create' do
   title = params[:title]
-  author = params[:author]
-  story = Story.create(title: title, author: author)
+  user_id = session[:user_id]
+  story = Story.create(title: title, user_id: user_id)
   id = story.id
   redirect "/create/#{id}"
 end
@@ -80,7 +118,7 @@ get '/create/:story_id' do
   @story = Story.find(@id)
   @pages = Page.where(story_id: @id)
 
-  erb :new_page
+  erb :'/create/new_page'
 end
 
 post '/create/:story_id' do

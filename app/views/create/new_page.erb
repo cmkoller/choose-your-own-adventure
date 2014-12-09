@@ -1,7 +1,7 @@
 <div class="row">
   <a href="#" data-reveal-id="myModal" class="right">How does this work?</a>
 
-  <h1>Make Your Own Adventure</h1>
+  <h2>Make Your Own Adventure</h2>
 
   <div id="myModal" class="reveal-modal" data-reveal>
     <h2>Use this form to build your story page-by-page.</h2>
@@ -33,7 +33,7 @@
       </div>
       <div class="large-6 columns">
         <label for="author">Author:</label>
-        <h6><%= @story.author %></h6>
+        <h6><%= User.find(@story.user_id).name %></h6>
       </div>
     </div>
     <hr />

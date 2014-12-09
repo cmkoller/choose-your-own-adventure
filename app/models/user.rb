@@ -14,7 +14,16 @@ class User < ActiveRecord::Base
     uid: auth.uid,
     email: auth.info.email,
     username: auth.info.nickname,
+    name: auth.info.name,
     avatar_url: auth.info.image
     )
+  end
+
+  def first_name
+    name.split(" ")[0]
+  end
+
+  def last_name
+    name.split(" ")[0]
   end
 end

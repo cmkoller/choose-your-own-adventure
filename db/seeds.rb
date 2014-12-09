@@ -1,5 +1,11 @@
+users = [
+  { provider: 'github', uid: '8760086', username: 'cmkoller',
+    name: 'Christina Koller', email: 'cmkoller01@gmail.com',
+    avatar_url: 'https://avatars.githubusercontent.com/u/8670086?v=3' }
+]
+
 stories = [
-  { title: "A Launch Academy Adventure", author: "Christina" }
+  { title: "A Launch Academy Adventure", user_id: '1' }
 ]
 
 pages = [
@@ -95,6 +101,10 @@ pages = [
     dest4: nil, action4: nil,
   },
 ]
+
+users.each do |user|
+  User.create(user)
+end
 
 stories.each do |story|
   Story.create(story)
