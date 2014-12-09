@@ -3,7 +3,6 @@ require 'csv'
 require 'pg'
 require 'sinatra'
 require 'sinatra/activerecord'
-require 'pry'
 require 'sinatra/flash'
 
 require 'omniauth-github'
