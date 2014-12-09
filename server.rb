@@ -1,4 +1,4 @@
-require 'Dotenv'
+require 'dotenv'
 require 'csv'
 require 'pg'
 require 'sinatra'
