@@ -1,11 +1,9 @@
-@import url(http://fonts.googleapis.com/css?family=Lobster);
+/* @import url(http://fonts.googleapis.com/css?family=Lobster); */
 
-.flash {
-  padding: 1em;
-  background-color: #3B9089;
-}
+@import url(http://fonts.googleapis.com/css?family=Nixie+One|Istok+Web|Lobster|Pacifico);
 
-h1.header {
+h1.header,
+.the-end {
   font-family: 'Lobster';
 }
 
@@ -13,8 +11,11 @@ h1.header {
   margin-top: .5rem;
 }
 
+h1, h2, h3 {
+  font-family: 'Nixie One';
+}
+
 .the-end {
-  font-family: 'Lobster';
   font-size: 4rem;
 }
 
